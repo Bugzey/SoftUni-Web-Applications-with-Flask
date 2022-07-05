@@ -3,5 +3,5 @@ curl \
 	localhost:5000/books/ \
 	-H 'Content-Type: application/json' \
 	-X POST \
-	-d '{"author": "test", "title": "test"}'
+	-d '{"author": "test", "title": "test", "reader_pk": 1}'
 
