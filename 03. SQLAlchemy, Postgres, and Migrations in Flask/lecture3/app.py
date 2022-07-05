@@ -13,15 +13,15 @@ from sqlalchemy.orm import (
 
 app = Flask(__name__)
 #app.config["SQLALCHEMY_DATABSE_URI"] =
-engine = db.create_engine(
-    "postgresql://{user}:{password}@{server}:{port}/{database}".format(
-        user = os.environ["USER"],
-        password = os.environ["PASSWORD"],
-        server = os.environ["SERVER"],
-        port = os.environ["PORT"],
-        database = os.environ["DATABASE"],
-    )
+URL = "postgresql://{user}:{password}@{server}:{port}/{database}".format(
+    user = os.environ["USER"],
+    password = os.environ["PASSWORD"],
+    server = os.environ["SERVER"],
+    port = os.environ["PORT"],
+    database = os.environ["DATABASE"],
 )
+
+engine = db.create_engine(URL)
 api = Api(app)
 Base = declarative_base()
 
@@ -30,6 +30,7 @@ class BookModel(Base):
     pk = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String)
     author = db.Column(db.String)
+    description = db.Column(db.String)
 
     def __repr__(self):
         return f"<{self.pk}: {self.tittle} from {self.author}"
