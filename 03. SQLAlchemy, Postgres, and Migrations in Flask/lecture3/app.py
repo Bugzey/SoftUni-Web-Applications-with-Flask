@@ -23,7 +23,8 @@ URL = "postgresql://{user}:{password}@{server}:{port}/{database}".format(
 
 engine = db.create_engine(URL)
 api = Api(app)
-Base = declarative_base()
+metadata = db.MetaData(schema = "lecture3")
+Base = declarative_base(metadata = metadata)
 
 #   Models
 #   Do separate these into models.py, please
