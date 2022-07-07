@@ -1,6 +1,7 @@
 alembic
 flask
 flask-restful
+marshmallow
 psycopg2-binary
 sqlalchemy>=1.4.39
 
