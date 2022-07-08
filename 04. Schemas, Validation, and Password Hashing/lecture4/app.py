@@ -22,7 +22,12 @@ from flask_restful import (
 from marshmallow import (
     Schema,
     fields,
+    ValidationError,
+    validate,
 )
+
+#   Optional password_strength module; not used
+#   from password_strength import PasswordPolicy
 
 from lecture4.models import *
 
@@ -40,13 +45,60 @@ engine = db.create_engine(URL)
 
 #   Schemas
 class BaseUserSchema(Schema):
-    username = fields.String()
-    email = fields.Email()
-    first_name = fields.String()
-    last_name = fields.String()
+    username = fields.String(required = True)
+    email = fields.Email(required = True)
+    first_name = fields.String(required = True)
+    last_name = fields.String(required = True)
+    phone = fields.String()
+
+
+def validate_password(password):
+    ok = True
+    ok = ok and bool(re.search("[A-Z]", password))
+    ok = ok and bool(re.search("\W", password))
+    ok = ok and bool(re.search("[0-9]", password))
+
+    if not ok:
+        raise ValidationError("Invalid password")
+
+class UserSignUpSchema(BaseUserSchema):
+    password = fields.String(
+        required = True, validate = [validate_password, validate.Length(min = 8)]
+    )
 
 
 #   API resources
+class UserSignUpResource(Resource):
+    def post(self):
+        data = request.json
+        schema = UserSignUpSchema()
+        errors = schema.validate(data)
+
+        if errors:
+            return errors
+
+        password_hash, salt = self.generate_password_hash_and_salt(data["password"])
+        data["password_hash"] = password_hash
+        data["password_salt"] = salt
+        del data["password"]
+
+        user = User(**data)
+        with Session(engine) as con:
+            con.add(user)
+            con.commit()
+
+    @staticmethod
+    def generate_password_hash_and_salt(password: str) -> tuple[bytes, bytes]:
+        #   Store password hash and salt
+        salt = os.urandom(16)
+        password_hash = scrypt(
+            password = password.encode(), salt = salt,
+            n = 2**10, r = 8, p = 1
+            #   https://words.filippo.io/the-scrypt-parameters/
+        )
+        return password_hash, salt
+
+
 class UserResource(Resource):
     def get(self, user_id = None):
         allowed_keys = {"user_id", "username", "first_name", "last_name"}
@@ -70,7 +122,8 @@ class UserResource(Resource):
 
             return 400
 
-    def post(self):
+    def legacy_post(self):
+        #   Saved for reference - wrote this before using schemas
         #   Create a new user
         data = request.json
         if not "username" in data and "password" in data:
@@ -112,6 +165,5 @@ api.add_resource(
     UserResource,
     "/user/<int:user_id>",
     "/users/",
-    "/signup/",
 )
-
+api.add_resource(UserSignUpResource, "/signup/")
