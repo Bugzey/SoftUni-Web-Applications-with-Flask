@@ -7,6 +7,7 @@ Lecture 4 application to learn:
 """
 
 import enum
+from hashlib import scrypt
 import os
 import re
 
@@ -18,7 +19,10 @@ from flask_restful import (
     Api,
     Resource,
 )
-from hashlib import scrypt
+from marshmallow import (
+    Schema,
+    fields,
+)
 
 from lecture4.models import *
 
@@ -34,6 +38,15 @@ app = Flask(__name__)
 api = Api(app)
 engine = db.create_engine(URL)
 
+#   Schemas
+class BaseUserSchema(Schema):
+    username = fields.String()
+    email = fields.Email()
+    first_name = fields.String()
+    last_name = fields.String()
+
+
+#   API resources
 class UserResource(Resource):
     def get(self, user_id = None):
         allowed_keys = {"user_id", "username", "first_name", "last_name"}
