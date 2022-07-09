@@ -36,7 +36,7 @@ class BookModel(Base):
     description = db.Column(db.String)
     reader_pk = db.Column(db.Integer, db.ForeignKey('readers.pk'))
     reader = relationship('ReaderModel')
-    
+
     def __repr__(self):
         return f"<{self.pk}: {self.tittle} from {self.author}"
 

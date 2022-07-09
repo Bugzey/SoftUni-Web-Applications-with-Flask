@@ -26,8 +26,9 @@ from marshmallow import (
     validate,
 )
 
-#   Optional password_strength module; not used
+#   Optional modules; not used
 #   from password_strength import PasswordPolicy
+#   import phone_numbers
 
 from lecture4.models import *
 
@@ -42,6 +43,10 @@ URL = "postgresql://{user}:{password}@{server}:{port}/{database}".format(
 app = Flask(__name__)
 api = Api(app)
 engine = db.create_engine(URL)
+
+
+#   TODO: decorator that wraps resource post methods and validates a schema given as an argument to
+#   the decorator
 
 #   Schemas
 class BaseUserSchema(Schema):
@@ -65,6 +70,11 @@ class UserSignUpSchema(BaseUserSchema):
     password = fields.String(
         required = True, validate = [validate_password, validate.Length(min = 8)]
     )
+
+    #   method way to validate data
+    #   marshmallow.validates("email")
+    #   def validate_password(self, password):
+    #       pass
 
 
 #   API resources
