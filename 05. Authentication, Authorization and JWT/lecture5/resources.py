@@ -97,6 +97,16 @@ def login_required(fun):
     return wrapped
 
 
+def role_required(role):
+    """
+    Decorator that first checks that the user's role is the one required by the resource"
+    """
+    #   TODO: check for roles and if not correct, return 403: Forbidden
+    def wrapper(fun):
+        def wrapped(*args, **kwargs):
+            return fun(*args, **kwargs)
+
+
 class UserInfoResource(BaseUserResource):
     @login_required
     def get(self, user_id: int = None):
