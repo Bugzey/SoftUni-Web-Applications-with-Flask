@@ -1,4 +1,5 @@
-flask
 alembic
+flask
+flask_httpauth
 marshmallow
 
