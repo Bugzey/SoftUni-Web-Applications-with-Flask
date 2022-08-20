@@ -1,13 +1,11 @@
 import sqlalchemy as db
 from sqlalchemy.orm import(
     declarative_base,
-    Session,
 )
 
-from lecture6.config import URL
+from lecture6.db import engine, sess
 
-engine = db.create_engine(URL)
-metadata = db.MetaData(schema = "lecture6")
+metadata = db.MetaData(bind = engine, schema = "lecture6")
 
 class BaseBase:
     id = db.Column(db.Integer, primary_key = True, nullable = False)
@@ -50,7 +48,5 @@ class ComplaintModel(Base):
     photo_url = db.Column(db.String(255), nullable=False)
     amount= db.Column(db.Float, nullable=False)
     status_id = db.Column( db.Integer, db.ForeignKey("status.id"), nullable=False)
-    status = db.orm.relationship(StatusModel)
     complainer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    complainer = db.orm.relationship(UserModel)
 

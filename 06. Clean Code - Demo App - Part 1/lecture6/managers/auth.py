@@ -4,7 +4,7 @@ from flask_httpauth import HTTPTokenAuth
 import jwt
 
 from lecture6.config import SECRET
-from lecture6.models import (db, UserModel, Session, engine)
+from lecture6.models import (db, UserModel, sess)
 
 class AuthManager:
     @staticmethod
@@ -27,13 +27,11 @@ class AuthManager:
 
 auth = HTTPTokenAuth(scheme='Bearer')
 
-
 @auth.verify_token
 def verify_token(token):
     try:
         user_id, type_user = AuthManager.decode_token(token)
-        with Session(engine) as con:
-            user = con.get(UserModel, user_id)
+        user = sess.get(UserModel, user_id)
         return user
     except Exception as ex:
         return "Invalid or missing token", 400
